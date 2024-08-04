@@ -2,8 +2,118 @@
 // utools文档
 
 // https://www.u.tools/docs/developer/api.html#%E7%AA%97%E5%8F%A3%E4%BA%A4%E4%BA%92
-window.versions={
-    node: () => process.versions.node,
-    chrome: () => process.versions.chrome,
-    electron: () => process.versions.electron
+import * as fs from "fs";
+import * as path from "path";
+import {debounce} from "lodash";
+
+interface Profile {
+    lastOpenedNote: string; // 最后打开的笔记
+    notesOrder: string[]; // 笔记的顺序
+}
+
+let notesDir = ''
+
+const excludeFiles = ['简记配置文件（勿删）.json']
+
+const setNotesDir = (_notesDir: string) => {
+    notesDir = _notesDir
+}
+
+const getNotesDir = () => {
+    return notesDir
+}
+
+const isNotesDirExist = () => {
+    return fs.existsSync(notesDir)
+}
+
+const getNotePath = (note: string) => {
+    return path.join(notesDir, `${note}.txt`)
+}
+
+const getProfilePath = () => {
+    return path.join(notesDir, '简记配置文件（勿删）.json')
+}
+
+const getNoteListAndLastOpenedNote = (): { noteList: string[], lastOpenedNote: string } => {
+    const files = fs.readdirSync(notesDir)
+    if (files.length === 0) {
+        return {
+            noteList: [],
+            lastOpenedNote: ''
+        }
+    }
+    const noteList = files
+        .filter((file: string) => file.endsWith('.txt') && !excludeFiles.includes(file))
+        .map((file: string) => file.slice(0, -4))
+    try {
+        const profile = JSON.parse(fs.readFileSync(getProfilePath(), 'utf8')) as Profile
+        noteList.sort((a: string, b: string) => profile.notesOrder.indexOf(a) - profile.notesOrder.indexOf(b))
+        return {
+            noteList,
+            lastOpenedNote: profile.lastOpenedNote
+        }
+    } catch (e) {
+        return {
+            noteList,
+            lastOpenedNote: ''
+        }
+    }
+}
+
+const getNoteContent = (note: string) => {
+    return fs.readFileSync(getNotePath(note), 'utf8');
+}
+
+const createNewNote = () => {
+    let i = 1
+    while (true) {
+        if (fs.existsSync(getNotePath(`新笔记-${i}`))) {
+            i++
+        } else {
+            break
+        }
+    }
+    const note = `新笔记-${i}`
+    fs.writeFileSync(getNotePath(note), '<p></p>');
+    return note
+}
+
+const renameNote = (_old: string, _new: string) => {
+    fs.renameSync(getNotePath(_old), getNotePath(_new))
+}
+
+const saveNote = debounce((note: string, content: string) => {
+    fs.writeFileSync(getNotePath(note), content, 'utf8')
+}, 250)
+
+const getNoteInfo = (note: string) => {
+    const {birthtime, mtime} = fs.statSync(getNotePath(note))
+    const info = {
+        createTime: birthtime.toLocaleString(),
+        lastModifyTime: mtime.toLocaleString()
+    }
+    return info
+}
+
+const saveProfile = (profile: Profile) => {
+    fs.writeFileSync(getProfilePath(), JSON.stringify(profile), 'utf8')
+}
+
+const removeNote = (note: string) => {
+    fs.unlinkSync(getNotePath(note))
+}
+
+window.p = {
+    setNotesDir,
+    getNotesDir,
+    isNotesDirExist,
+    getNoteListAndLastOpenedNote,
+    getNoteContent,
+    createNewNote,
+    renameNote,
+    saveNote,
+    getNoteInfo,
+    removeNote,
+    saveProfile,
 }

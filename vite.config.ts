@@ -5,6 +5,7 @@ import pkg from './package.json'
 import electron from 'vite-plugin-electron'
 import { rmSync } from 'node:fs'
 import { notBundle } from 'vite-plugin-electron/plugin'
+import path from "path";
 
 
 
@@ -18,6 +19,11 @@ export default defineConfig(({ command, mode }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
   return {
     base: './',
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      }
+    },
     plugins: [vue(),
     utools({
       entry: [

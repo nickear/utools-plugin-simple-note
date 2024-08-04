@@ -1,36 +1,48 @@
 <script setup lang="ts">
-const chromeVersion = window.versions.chrome()
-const electronVersion = window.versions.electron()
-const nodeVersion = window.versions.node()
+import {ref} from "vue";
+import SimpleNote from '@/component/simpleNote/index.vue'
+import Setting from '@/component/setting/index.vue'
+import {ElMessageBox} from "element-plus";
+
+const pluginCode = ref<string>('')
+utools.onPluginEnter(({code}) => {
+    const notesDir = utools.db.get('jianji-notes-dir')?.value
+    window.p.setNotesDir(notesDir || '')
+    if (code !== 'jj-setting') {
+        let message = ''
+        if (!notesDir) {
+            message = '尚未设置存放笔记的文件夹，请先设置'
+        } else if (!window.p.isNotesDirExist()) {
+            message = `文件夹「${notesDir}」不存在，请重新设置`
+        }
+        if (message) {
+            pluginCode.value = 'jj-setting'
+            ElMessageBox.alert(message, '提示', {
+                showClose: false,
+                confirmButtonText: '确定'
+            })
+            return
+        }
+    } else if (notesDir && !window.p.isNotesDirExist()) {
+        ElMessageBox.alert(`文件夹「${notesDir}」不存在，请重新设置`, '提示', {
+            showClose: false,
+            confirmButtonText: '确定'
+        })
+    }
+    pluginCode.value = code
+})
+utools.onPluginOut(() => {
+    ElMessageBox.close()
+    pluginCode.value = ''
+})
+
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <h1>Hello World</h1>
-  <h1>Utools Vue3 插件模板</h1>
-  <p>当前插件系统基于Electron(V{{ electronVersion }})，Chrome(V{{ chromeVersion }})，Node.js(V{{ nodeVersion }})</p>
+    <Setting v-if="pluginCode === 'jj-setting'"></Setting>
+    <SimpleNote v-else-if="pluginCode" :plugin-code="pluginCode"></SimpleNote>
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
 </style>

@@ -2,18 +2,25 @@
 	"logo": "logo.png",
 	"main": "index.html",
 	"preload": "preload.js",
-	"name": "your plugin ID",
+	"name": "za8zf3dx",
 	"version": "1.0.0",
-	"pluginName": "template",
-	"description": "plugin template",
-	"author": "QC2168",
-	"homepage": "https://github.com/QC2168",
+	"pluginName": "简记",
+	"description": "简单记录",
+	"author": "nickear",
+	"homepage": "https://github.com/nickear",
 	"features": [
 		{
-			"code": "template",
-			"explain": "插件模板主界面",
+			"code": "jj",
+			"explain": "简记",
 			"cmds": [
-				"template"
+				"jj", "jianji"
+			]
+		},
+		{
+			"code": "jj-setting",
+			"explain": "简记设置",
+			"cmds": [
+				"jj-setting", "jianji-setting"
 			]
 		}
 	]
