@@ -13,8 +13,6 @@ interface Profile {
 
 let notesDir = ''
 
-const excludeFiles = ['简记配置文件（勿删）.json']
-
 const setNotesDir = (_notesDir: string) => {
     notesDir = _notesDir
 }
@@ -28,7 +26,7 @@ const isNotesDirExist = () => {
 }
 
 const getNotePath = (note: string) => {
-    return path.join(notesDir, `${note}.txt`)
+    return path.join(notesDir, `${note}.jianji`)
 }
 
 const getProfilePath = () => {
@@ -44,8 +42,8 @@ const getNoteListAndLastOpenedNote = (): { noteList: string[], lastOpenedNote: s
         }
     }
     const noteList = files
-        .filter((file: string) => file.endsWith('.txt') && !excludeFiles.includes(file))
-        .map((file: string) => file.slice(0, -4))
+        .filter((file: string) => file.endsWith('.jianji'))
+        .map((file: string) => file.slice(0, -7))
     try {
         const profile = JSON.parse(fs.readFileSync(getProfilePath(), 'utf8')) as Profile
         noteList.sort((a: string, b: string) => profile.notesOrder.indexOf(a) - profile.notesOrder.indexOf(b))
