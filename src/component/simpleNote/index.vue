@@ -182,9 +182,15 @@ const handleTitleInput = (val: string) => {
 }
 
 const handleTitleChange = (newTitle: string) => {
-    if (noteList.value.indexOf(newTitle) !== -1) {
+    let message = ''
+    if (!newTitle) {
+        message = '修改失败，笔记名称不能为空'
+    } else if (noteList.value.indexOf(newTitle) !== -1) {
+        message = '修改失败，笔记名称重复'
+    }
+    if (message) {
         ElMessage.warning({
-            message: '修改失败，笔记名称重复',
+            message,
             showClose: true
         })
         title.value = openedNote.value
@@ -288,7 +294,9 @@ onMounted(() => {
 
     if (props.pluginCode === 'jj') {
         if (noteList.value.length) {
-            handleNoteChange(lastOpenedNote || noteList.value[0], false)
+            handleNoteChange(
+                lastOpenedNote && noteList.value.includes(lastOpenedNote)
+                    ? lastOpenedNote : noteList.value[0], false)
         }
     } else {
         let note = noteList.value.find((note: string) => note === props.pluginCode)
@@ -298,7 +306,9 @@ onMounted(() => {
                 showClose: true
             })
             if (noteList.value.length) {
-                handleNoteChange(lastOpenedNote || noteList.value[0], false)
+                handleNoteChange(
+                    lastOpenedNote && noteList.value.includes(lastOpenedNote)
+                        ? lastOpenedNote : noteList.value[0], false)
             }
         } else {
             showSidebar.value = false

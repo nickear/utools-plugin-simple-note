@@ -42,7 +42,8 @@ const getNoteListAndLastOpenedNote = (): { noteList: string[], lastOpenedNote: s
         }
     }
     const noteList = files
-        .filter((file: string) => file.endsWith('.jianji'))
+        .filter((file: string) =>
+            fs.statSync(path.join(notesDir, file)).isFile() && path.extname(file) === '.jianji')
         .map((file: string) => file.slice(0, -7))
     try {
         const profile = JSON.parse(fs.readFileSync(getProfilePath(), 'utf8')) as Profile
