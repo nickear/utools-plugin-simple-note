@@ -167,12 +167,16 @@ const handleFolderOpenBtnClick = () => {
     utools.shellOpenPath(window.p.getNotesDir())
 }
 
+const handleSettingBtnClick = () => {
+    utools.redirect(['简记', 'jj-setting'], '')
+}
+
 const handleDraggableChange = () => {
     saveProfile()
 }
 
 const handleTitleInput = (val: string) => {
-    const pattern = /[\\/:*?"<>|]/
+    const pattern = /[\\/:*?"<>|]/g
     if (pattern.test(val)) {
         tipsVisible.value = true
         title.value = val.replace(pattern, '')
@@ -185,7 +189,9 @@ const handleTitleChange = (newTitle: string) => {
     let message = ''
     if (!newTitle) {
         message = '修改失败，笔记名称不能为空'
-    } else if (noteList.value.indexOf(newTitle) !== -1) {
+    } else if (newTitle.length > 100) {
+        message = '修改失败，笔记名称不能超过100个字符'
+    }  else if (noteList.value.indexOf(newTitle) !== -1) {
         message = '修改失败，笔记名称重复'
     }
     if (message) {
@@ -339,6 +345,9 @@ onBeforeUnmount(() => {
                 <div class="header-btn left-header-btn" title="打开笔记所在文件夹" @click="handleFolderOpenBtnClick">
                     <img src="@/assets/folder-open.svg">
                 </div>
+                <div class="header-btn left-header-btn" title="进入设置界面" @click="handleSettingBtnClick">
+                    <img src="@/assets/setting.svg">
+                </div>
             </div>
             <div style="height: calc(100vh - 40px); overflow-y: auto">
                 <draggable :list="noteListDisplay" ghost-class="ghost"
@@ -351,7 +360,9 @@ onBeforeUnmount(() => {
                          {'note-item-underline': notesWithKeyword.includes(element)}
                          ]"
                              @click="handleNoteClick(element)"
-                             @contextmenu="handleNoteContextMenu($event, element)">
+                             @contextmenu="handleNoteContextMenu($event, element)"
+                             :title="element"
+                        >
                             {{ element }}
                         </div>
                     </template>
@@ -561,7 +572,7 @@ onBeforeUnmount(() => {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vh;
+    width: 100vw;
     height: 100vh;
     background-color: transparent;
     z-index: 999; /* 确保上下文菜单在遮罩层在之上 */

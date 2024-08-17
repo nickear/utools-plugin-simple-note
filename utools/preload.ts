@@ -5,6 +5,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import {debounce} from "lodash";
+import * as fsp from 'fs/promises'
 
 interface Profile {
     lastOpenedNote: string; // 最后打开的笔记
@@ -103,6 +104,33 @@ const removeNote = (note: string) => {
     fs.unlinkSync(getNotePath(note))
 }
 
+const moveNotesAndProfile = async (sourceDir: string, targetDir: string) => {
+    let successCount = 0
+    const notes = []
+    try {
+        const files = await fsp.readdir(sourceDir)
+        for (const file of files) {
+            if ((await fsp.stat(path.join(sourceDir, file))).isFile() && path.extname(file) === '.jianji') {
+                notes.push(file)
+            }
+        }
+        for (const note of notes) {
+            try {
+                await fsp.rename(path.join(sourceDir, note), path.join(targetDir, note))
+                successCount++
+            } catch (e) {
+
+            }
+        }
+        fs.renameSync(path.join(sourceDir, '简记配置文件（勿删）.json'), path.join(targetDir, '简记配置文件（勿删）.json'))
+    } finally {
+        return {
+            successCount,
+            targetCount: notes.length
+        }
+    }
+}
+
 window.p = {
     setNotesDir,
     getNotesDir,
@@ -115,4 +143,5 @@ window.p = {
     getNoteInfo,
     removeNote,
     saveProfile,
+    moveNotesAndProfile
 }
