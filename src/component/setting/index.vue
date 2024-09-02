@@ -3,6 +3,7 @@ import {ref} from "vue";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {ElMessageBoxOptions} from "element-plus/es/components/message-box/src/message-box.type";
 
+const emit = defineEmits(['back'])
 const notesDir = ref<string>(window.p.getNotesDir())
 const loading = ref<boolean>(false)
 const handleBtnClick = () => {
@@ -25,6 +26,7 @@ const handleBtnClick = () => {
         if (res.ok) {
             const oldNotesDir = notesDir.value
             notesDir.value = files[0]
+            window.p.setNotesDir(files[0])
             if (oldNotesDir) {
                 ElMessageBox.confirm(
                     `设置成功！是否将旧文件夹中的笔记迁移到新文件夹？`,
@@ -78,25 +80,29 @@ const handleBtnClick = () => {
         }
     }
 }
-
 </script>
 
 <template>
-    <div class="main-container" v-loading="loading">
-        <h3 class="title">
-            设置存放笔记的文件夹
-        </h3>
-        <el-input :value="notesDir" readonly>
-            <template #append>
-                <el-button style="background-color: #597ef7; color: white" @click="handleBtnClick">选择文件夹
-                </el-button>
-            </template>
-        </el-input>
+    <div v-loading="loading">
+        <el-button style="margin-left: 10px; color: white" v-if="notesDir"
+                   color="#597ef7" @click="emit('back')">返回
+        </el-button>
+        <div class="content">
+            <h3 class="title">
+                设置存放笔记的文件夹
+            </h3>
+            <el-input :value="notesDir" readonly>
+                <template #append>
+                    <el-button style="background-color: #597ef7; color: white" @click="handleBtnClick">选择文件夹
+                    </el-button>
+                </template>
+            </el-input>
+        </div>
     </div>
 </template>
 
 <style scoped>
-.main-container {
+.content {
     width: 70%;
     margin: 30px auto 0 auto;
 }

@@ -8,28 +8,17 @@ const pluginCode = ref<string>('')
 utools.onPluginEnter(({code}) => {
     const notesDir = utools.db.get('jianji-notes-dir')?.value
     window.p.setNotesDir(notesDir || '')
-    if (code !== 'jj-setting') {
-        let message = ''
-        if (!notesDir) {
-            message = '尚未设置存放笔记的文件夹，请先设置'
-        } else if (!window.p.isNotesDirExist()) {
-            message = `文件夹「${notesDir}」不存在，请重新设置`
-        }
-        if (message) {
-            pluginCode.value = 'jj-setting'
-            ElMessageBox.alert(message, '提示', {
-                showClose: false,
-                confirmButtonText: '确定'
-            })
-            return
-        }
-    } else if (notesDir && !window.p.isNotesDirExist()) {
+    if (!notesDir) {
+        pluginCode.value = 'jj-setting'
+    } else if (!window.p.isNotesDirExist()) {
+        pluginCode.value = 'jj-setting'
         ElMessageBox.alert(`文件夹「${notesDir}」不存在，请重新设置`, '提示', {
             showClose: false,
             confirmButtonText: '确定'
         })
+    } else {
+        pluginCode.value = code
     }
-    pluginCode.value = code
 })
 utools.onPluginOut(() => {
     ElMessageBox.close()
@@ -39,8 +28,8 @@ utools.onPluginOut(() => {
 </script>
 
 <template>
-    <Setting v-if="pluginCode === 'jj-setting'"></Setting>
-    <SimpleNote v-else-if="pluginCode" :plugin-code="pluginCode"></SimpleNote>
+    <Setting v-if="pluginCode === 'jj-setting'" @back="pluginCode = 'jj'"></Setting>
+    <SimpleNote v-else-if="pluginCode" :plugin-code="pluginCode" @setting="pluginCode = 'jj-setting'"></SimpleNote>
 </template>
 
 <style scoped>

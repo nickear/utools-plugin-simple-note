@@ -9,6 +9,7 @@ import draggable from 'vuedraggable'
 import {ElMessageBoxOptions} from "element-plus/es/components/message-box/src/message-box.type";
 
 const props = defineProps(['pluginCode'])
+const emit = defineEmits(['setting'])
 // 编辑器实例，必须用 shallowRef
 const editorRef = shallowRef<IDomEditor>()
 const toolbarConfig = {
@@ -165,10 +166,6 @@ const handleNoteAddBtnClick = () => {
 
 const handleFolderOpenBtnClick = () => {
     utools.shellOpenPath(window.p.getNotesDir())
-}
-
-const handleSettingBtnClick = () => {
-    utools.redirect(['简记', 'jj-setting'], '')
 }
 
 const handleDraggableChange = () => {
@@ -345,7 +342,7 @@ onBeforeUnmount(() => {
                 <div class="header-btn left-header-btn" title="打开笔记所在文件夹" @click="handleFolderOpenBtnClick">
                     <img src="@/assets/folder-open.svg">
                 </div>
-                <div class="header-btn left-header-btn" title="进入设置界面" @click="handleSettingBtnClick">
+                <div class="header-btn left-header-btn" title="进入设置界面" @click="emit('setting')">
                     <img src="@/assets/setting.svg">
                 </div>
             </div>

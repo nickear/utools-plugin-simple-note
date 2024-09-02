@@ -23,7 +23,11 @@ const getNotesDir = () => {
 }
 
 const isNotesDirExist = () => {
-    return fs.existsSync(notesDir)
+    if (fs.existsSync(notesDir)) {
+        return true
+    }
+    notesDir = ''
+    return false
 }
 
 const getNotePath = (note: string) => {

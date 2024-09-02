@@ -15,13 +15,6 @@
 			"cmds": [
 				"jj", "jianji"
 			]
-		},
-		{
-			"code": "jj-setting",
-			"explain": "简记设置",
-			"cmds": [
-				"jj-setting", "jianji-setting"
-			]
 		}
 	]
 }
